@@ -1,0 +1,33 @@
+name: Auto-merge
+
+# Turns on GitHub auto-merge for pull requests opened by the repository owner.
+# GitHub then merges the PR by itself once every required check (see branch
+# protection: "CI passed") is green. If CI fails, nothing is merged.
+#
+# Safety: uses `pull_request` (not `pull_request_target`), never checks out PR
+# code, and skips drafts, forks and PRs from anyone but the repository owner.
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  enable:
+    name: Enable auto-merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login == github.repository_owner
+    steps:
+      # --merge keeps every commit (and its descriptive message) on main.
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --merge "$PR_URL"

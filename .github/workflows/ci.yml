@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Syntax check
+        run: |
+          for f in assets/js/*.js scripts/*.mjs; do
+            node --check "$f"
+          done
+
+      - name: Tests
+        run: npm test
+
+  # Single, stable status name for branch protection. Branch protection requires
+  # this one check instead of every matrix entry, so changing the Node versions
+  # above never breaks the merge rules.
+  ci-passed:
+    name: CI passed
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every test job to succeed
+        env:
+          RESULT: ${{ needs.test.result }}
+        run: |
+          echo "test jobs: $RESULT"
+          [ "$RESULT" = "success" ]
