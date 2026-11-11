@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Voxtab – Voice Tab Launcher</title>
+  <meta name="description" content="Say a command and your browser opens the tab. Voxtab is a voice-controlled launcher for websites, searches and shortcuts.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#07080d">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/theme-init.js"></script>
+</head>
+<body>
+  <!-- SVG icon sprite -->
+  <svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <symbol id="i-mic" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4Zm6-4a1 1 0 1 1 2 0 8 8 0 0 1-7 7.94V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.06A8 8 0 0 1 4 11a1 1 0 1 1 2 0 6 6 0 0 0 12 0Z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></g></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></g></symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4M12 17.5v.01"/></g></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.01"/></g></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <a class="skip-link" href="#stage">Skip to main content</a>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Voxtab home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="bm" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <rect width="32" height="32" rx="9" fill="url(#bm)"/>
+        <g fill="#fff"><rect x="7" y="13" width="3" height="6" rx="1.5"/><rect x="12" y="9" width="3" height="14" rx="1.5"/><rect x="17" y="6" width="3" height="20" rx="1.5"/><rect x="22" y="11" width="3" height="10" rx="1.5"/></g>
+      </svg>
+      <span>Voxtab</span>
+    </a>
+    <div class="topbar-actions">
+      <span id="supportPill" class="pill" data-state="checking"><i class="dot"></i><span id="supportText">Checking…</span></span>
+      <button id="themeToggle" class="icon-btn" type="button" aria-label="Switch color theme">
+        <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="stage" aria-labelledby="title">
+      <p class="eyebrow">Voice-controlled browser tabs</p>
+      <h1 id="title">Say it. <br><span class="gradient-text">Your tab opens.</span></h1>
+      <p class="lead">Tap the mic and speak, like <em>“open YouTube”</em> or <em>“search lo-fi beats on YouTube”</em>. Voxtab understands the sentence and launches the right page in a new tab.</p>
+
+      <div id="unsupported" class="notice" role="note" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+        <p><strong>This browser has no speech recognition.</strong> Use Chrome, Edge or Safari to talk to Voxtab. You can still type any command below.</p>
+      </div>
+
+      <div class="orb-wrap">
+        <canvas id="viz" aria-hidden="true"></canvas>
+        <button id="micButton" class="orb" type="button" aria-pressed="false" aria-label="Start listening">
+          <span class="orb-ring" aria-hidden="true"></span>
+          <span class="orb-ring" aria-hidden="true"></span>
+          <svg class="icon icon-mic" aria-hidden="true"><use href="#i-mic"/></svg>
+          <svg class="icon icon-stop" aria-hidden="true"><use href="#i-stop"/></svg>
+        </button>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite">Tap the mic or press <kbd>Space</kbd></p>
+      <div id="transcript" class="transcript" aria-live="polite" aria-atomic="true">
+        <span class="placeholder">Your words will appear here…</span>
+      </div>
+
+      <form id="commandForm" class="command-form" autocomplete="off">
+        <label class="sr-only" for="commandInput">Type a command</label>
+        <input id="commandInput" type="text" maxlength="200" spellcheck="false" placeholder="Or type a command, e.g. “open github and reddit”">
+        <button type="submit" class="btn btn-primary">Run</button>
+      </form>
+
+      <div id="resultCard" class="result-card" hidden></div>
+
+      <ul id="exampleChips" class="chips" aria-label="Try one of these commands"></ul>
+    </section>
+
+    <section class="grid" aria-label="Guides and settings">
+      <article class="card" id="guide">
+        <h2>What you can say</h2>
+        <p class="card-sub">Speak naturally. Words like “please” or “can you” are ignored. Tap any phrase to try it.</p>
+        <div class="guide-groups">
+          <div>
+            <h3>Open</h3>
+            <ul class="say-list">
+              <li><button type="button" class="say" data-say="Open YouTube">Open YouTube</button></li>
+              <li><button type="button" class="say" data-say="Go to wikipedia.org">Go to wikipedia.org</button></li>
+              <li><button type="button" class="say" data-say="Open GitHub and Reddit">Open GitHub and Reddit</button></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Search</h3>
+            <ul class="say-list">
+              <li><button type="button" class="say" data-say="Search for lo-fi beats on YouTube">Search for lo-fi beats on YouTube</button></li>
+              <li><button type="button" class="say" data-say="Play Daft Punk">Play Daft Punk</button></li>
+              <li><button type="button" class="say" data-say="Google how to center a div">Google how to center a div</button></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Manage tabs</h3>
+            <ul class="say-list">
+              <li><button type="button" class="say" data-say="Close the last tab">Close the last tab</button></li>
+              <li><button type="button" class="say" data-say="Close all tabs">Close all tabs</button></li>
+            </ul>
+          </div>
+        </div>
+        <p class="tip"><strong>Tip:</strong> say “dot” for a full stop: <em>“go to example dot com”</em>. Up to five tabs open at once.</p>
+      </article>
+
+      <article class="card" id="settingsCard">
+        <h2>Settings</h2>
+        <div class="settings">
+          <div class="field">
+            <label for="langSelect">Recognition language</label>
+            <select id="langSelect"></select>
+            <p class="hint">Commands and site names work best in English. Indonesian verbs like “buka” work too.</p>
+          </div>
+          <label class="switch">
+            <input id="optSpeak" type="checkbox">
+            <span class="switch-ui" aria-hidden="true"></span>
+            <span class="switch-text"><strong>Speak replies</strong><small>Voxtab says what it understood.</small></span>
+          </label>
+          <label class="switch">
+            <input id="optConfirm" type="checkbox">
+            <span class="switch-ui" aria-hidden="true"></span>
+            <span class="switch-text"><strong>Ask before opening</strong><small>Review the result, then click to open.</small></span>
+          </label>
+          <label class="switch">
+            <input id="optKeep" type="checkbox">
+            <span class="switch-ui" aria-hidden="true"></span>
+            <span class="switch-text"><strong>Keep listening</strong><small>Hands-free. Needs pop-ups allowed for this page.</small></span>
+          </label>
+        </div>
+      </article>
+
+      <article class="card card-wide" id="sitesCard">
+        <h2>Sites Voxtab knows</h2>
+        <p class="card-sub">Say the name, or tap one. Anything with a search box also understands “search … on &lt;site&gt;”.</p>
+        <ul id="siteGrid" class="site-grid"></ul>
+      </article>
+
+      <article class="card" id="shortcutsCard">
+        <h2>Your shortcuts</h2>
+        <p class="card-sub">Teach Voxtab your own phrases. Say “open <em>my docs</em>” to jump straight to a page.</p>
+        <form id="shortcutForm" class="shortcut-form" autocomplete="off" novalidate>
+          <div class="field">
+            <label for="shortcutPhrase">Phrase</label>
+            <input id="shortcutPhrase" type="text" maxlength="40" placeholder="my docs" spellcheck="false">
+          </div>
+          <div class="field">
+            <label for="shortcutUrl">Web address</label>
+            <input id="shortcutUrl" type="text" maxlength="300" placeholder="https://docs.example.com" spellcheck="false" inputmode="url">
+          </div>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+        <p id="shortcutError" class="form-error" role="alert" hidden></p>
+        <ul id="shortcutList" class="list"></ul>
+        <p id="shortcutEmpty" class="empty">No shortcuts yet.</p>
+      </article>
+
+      <article class="card" id="historyCard">
+        <div class="card-head">
+          <h2>Recent commands</h2>
+          <button id="clearHistory" class="btn btn-ghost btn-sm" type="button">Clear</button>
+        </div>
+        <ul id="historyList" class="list"></ul>
+        <p id="historyEmpty" class="empty">Nothing yet. Say something!</p>
+      </article>
+
+      <article class="card card-wide" id="privacyCard">
+        <h2>How it works &amp; privacy</h2>
+        <ul class="plain">
+          <li>Your browser’s built-in <strong>Web Speech API</strong> turns audio into text. Chrome and Edge send the audio to their cloud speech service to do this.</li>
+          <li>Voxtab itself is a static page: <strong>no server, no account, no analytics</strong>. Settings, shortcuts and history stay in this browser’s local storage.</li>
+          <li>Only plain <code>http(s)</code> links are ever opened. Search text is URL-encoded.</li>
+          <li>If nothing opens, allow pop-ups for this page (look for the blocked icon in the address bar). Browsers block tabs opened without a click.</li>
+        </ul>
+      </article>
+
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Voxtab · built with plain HTML, CSS &amp; JavaScript · works best in Chrome and Edge</p>
+  </footer>
+
+  <div id="toasts" class="toasts" role="region" aria-label="Notifications"></div>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

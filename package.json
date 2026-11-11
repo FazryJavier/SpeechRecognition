@@ -1,0 +1,14 @@
+{
+  "name": "voxtab",
+  "version": "1.0.0",
+  "description": "Voice-controlled browser tab launcher. Say a command, a tab opens.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test"
+  }
+}
