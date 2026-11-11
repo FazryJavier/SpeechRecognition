@@ -41,7 +41,9 @@ export function resolveRequestPath(requestUrl, root = ROOT) {
   } catch {
     return null;
   }
-  if (pathname.includes('\0')) return null;
+  // NUL bytes are never valid; backslashes are path separators on Windows but
+  // plain characters on POSIX, so reject them everywhere for identical behaviour.
+  if (pathname.includes('\0') || pathname.includes('\\')) return null;
   if (pathname === '/') pathname = '/index.html';
   if (pathname !== '/index.html' && !pathname.startsWith('/assets/')) return null;
 
